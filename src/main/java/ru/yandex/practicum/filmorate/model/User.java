@@ -9,16 +9,16 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor
-public class Film {
+public class User {
 
     @EqualsAndHashCode.Include
     private Long id;
 
+    private String email;
+
+    private String login;
+
     private String name;
 
-    private String description;
-
-    private LocalDate releaseDate;
-
-    private int duration;
+    private LocalDate birthday;
 }
