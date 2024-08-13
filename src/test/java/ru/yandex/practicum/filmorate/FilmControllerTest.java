@@ -16,6 +16,7 @@ public class FilmControllerTest {
     public void getController() {
         filmController = new FilmController();
     }
+
     @Test
     public void givenCorrectFilm_shouldCreateFilm() {
         Film film = new Film(null, "Test name", "Test description",
@@ -24,12 +25,14 @@ public class FilmControllerTest {
         Assertions.assertNotNull(filmReturned);
         Assertions.assertEquals(1, filmController.findAll().size());
     }
+
     @Test
     public void givenIncorrectFilm_shouldNotCreateFilm() {
         Film film = new Film(null, "Test name", "Test description",
                 LocalDate.of(2010, 1, 1), -60);
         Assertions.assertThrows(ValidationException.class, () -> filmController.create(film));
     }
+
     @Test
     public void givenCorrectFilm_shouldUpdateFilm() {
         Film film = new Film(null, "Test name", "Test description",
@@ -43,6 +46,7 @@ public class FilmControllerTest {
         Assertions.assertEquals(film.getName(), "Test name 2");
         Assertions.assertEquals(film.getDescription(), "Test description 2");
     }
+
     @Test
     public void givenIncorrectFilm_shouldNotUpdateFilm() {
         Film filmReturned = filmController.create(new Film(null,
@@ -53,6 +57,7 @@ public class FilmControllerTest {
                 "Test name 2", "Test description 2",
                 LocalDate.of(2010, 1, 1), -60)));
     }
+
     @Test
     public void givenCorrectFilms_shouldReturnFilmCollection() {
         Film filmReturned = filmController.create(new Film(null,

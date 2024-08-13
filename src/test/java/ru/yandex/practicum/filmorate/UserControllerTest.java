@@ -17,6 +17,7 @@ public class UserControllerTest {
     public void getController() {
         userController = new UserController();
     }
+
     @Test
     public void givenCorrectUser_shouldCreateUser() {
         User user = new User(null, "example@example.com", "Test_login",
@@ -25,12 +26,14 @@ public class UserControllerTest {
         Assertions.assertNotNull(userReturned);
         Assertions.assertEquals(1, userController.findAll().size());
     }
+
     @Test
     public void givenIncorrectUser_shouldNotCreateUser() {
         User user = new User(null, "example@example.com", "",
                 "Test name", LocalDate.of(2000, 1, 1));
         Assertions.assertThrows(ValidationException.class, () -> userController.create(user));
     }
+
     @Test
     public void givenCorrectUser_shouldUpdateUser() {
         User user = new User(null, "example@example.com", "Test_login",
@@ -43,6 +46,7 @@ public class UserControllerTest {
         Assertions.assertEquals(user.getName(), "Test name 2");
         Assertions.assertEquals(user.getLogin(), "Test_login_2");
     }
+
     @Test
     public void givenIncorrectUser_shouldNotUpdateUser() {
         User userReturned = userController.create(new User(null, "example@example.com",
@@ -51,6 +55,7 @@ public class UserControllerTest {
         Assertions.assertThrows(ValidationException.class, () -> userController.create(new User(null, "example_example.com",
                 "Test_login", "Test name", LocalDate.of(2000, 1, 1))));
     }
+
     @Test
     public void givenCorrectUsers_shouldReturnUserCollection() {
         User userReturned = userController.create(new User(null, "example@example.com",
