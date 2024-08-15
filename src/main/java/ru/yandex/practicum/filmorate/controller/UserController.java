@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -23,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@RequestBody User user) {
+    public User create(@Valid @RequestBody User user) {
         isValid(user);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -35,11 +36,9 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@RequestBody User newUser) {
+    public User update(@Valid @RequestBody User newUser) {
         if (newUser.getId() == null) {
-            String message = "Id пользователя должен быть указан";
-            log.error(message, newUser);
-            throw new ValidationException(message);
+            processError("Id пользователя должен быть указан", newUser);
         }
         isValid(newUser);
         if (users.containsKey(newUser.getId())) {
@@ -63,22 +62,15 @@ public class UserController {
     private void isValid(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank()
                 || !user.getEmail().contains("@")) {
-            String message = "Некорректный email";
-            log.error(message, user);
-            throw new ValidationException(message);
+            processError("Некорректный email", user);
         }
         if (user.getLogin() == null || user.getLogin().isBlank()
                 || user.getLogin().contains(" ")) {
-            String message = "Некорректный логин";
-            log.error(message, user);
-            throw new ValidationException(message);
+            processError("Некорректный логин", user);
         }
         if (user.getBirthday() != null
                 && user.getBirthday().isAfter(LocalDate.now())) {
-            String message = "Дата рождения не может быть позже "
-                    + LocalDate.now();
-            log.error(message, user);
-            throw new ValidationException(message);
+            processError("Дата рождения не может быть позже " + LocalDate.now(), user);
         }
     }
 
@@ -89,5 +81,10 @@ public class UserController {
                 .max()
                 .orElse(0);
         return ++currentMaxId;
+    }
+
+    private void processError(String message, User user) {
+        log.error(message, user);
+        throw new ValidationException(message);
     }
 }

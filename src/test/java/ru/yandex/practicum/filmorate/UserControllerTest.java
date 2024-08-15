@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,13 +11,17 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class UserControllerTest {
 
     UserController userController;
+    Validator validator;
 
     @BeforeEach
     public void getController() {
         userController = new UserController();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Test
@@ -32,6 +38,13 @@ public class UserControllerTest {
         User user = new User(null, "example@example.com", "",
                 "Test name", LocalDate.of(2000, 1, 1));
         Assertions.assertThrows(ValidationException.class, () -> userController.create(user));
+    }
+
+    @Test
+    public void givenIncorrectUserEmail_shouldNotCreateUser() {
+        User user = new User(null, ".com@", "Test_login",
+                "Test name", LocalDate.of(2000, 1, 1));
+        assertThat(validator.validate(user).size()).isEqualTo(1);
     }
 
     @Test
@@ -53,7 +66,7 @@ public class UserControllerTest {
                 "Test_login", "Test name", LocalDate.of(2000, 1, 1)));
         Assertions.assertNotNull(userReturned);
         Assertions.assertThrows(ValidationException.class, () -> userController.create(new User(null, "example_example.com",
-                "Test_login", "Test name", LocalDate.of(2000, 1, 1))));
+                "", "Test name", LocalDate.of(2000, 1, 1))));
     }
 
     @Test

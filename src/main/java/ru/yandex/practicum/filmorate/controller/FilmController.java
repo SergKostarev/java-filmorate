@@ -34,9 +34,7 @@ public class FilmController {
     @PutMapping
     public Film update(@RequestBody Film newFilm) {
         if (newFilm.getId() == null) {
-            String message = "Id фильма должен быть указан";
-            log.error(message, newFilm);
-            throw new ValidationException(message);
+            processError("Id фильма должен быть указан", newFilm);
         }
         isValid(newFilm);
         if (films.containsKey(newFilm.getId())) {
@@ -55,25 +53,17 @@ public class FilmController {
 
     private void isValid(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            String message = "Название фильма не может быть пустым";
-            log.error(message, film);
-            throw new ValidationException(message);
+            processError("Название фильма не может быть пустым", film);
         }
         if (film.getDescription() != null && film.getDescription().length() > 200) {
-            String message = "Название фильма может содержать не более 200 символов";
-            log.error(message, film);
-            throw new ValidationException(message);
+            processError("Название фильма может содержать не более 200 символов", film);
         }
         if (film.getReleaseDate() != null
                 && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            String message = "Дата выхода фильма должна быть позже 28 декабря 1895";
-            log.error(message, film);
-            throw new ValidationException(message);
+            processError("Дата выхода фильма должна быть позже 28 декабря 1895", film);
         }
         if (film.getDuration() < 0) {
-            String message = "Продолжительность фильма должна быть положительным числом";
-            log.error(message, film);
-            throw new ValidationException(message);
+            processError("Продолжительность фильма должна быть положительным числом", film);
         }
     }
 
@@ -84,6 +74,11 @@ public class FilmController {
                 .max()
                 .orElse(0);
         return ++currentMaxId;
+    }
+
+    private void processError(String message, Film film) {
+        log.error(message, film);
+        throw new ValidationException(message);
     }
 
 }
