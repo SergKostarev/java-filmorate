@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -18,7 +19,7 @@ public class FilmControllerTest {
 
     @BeforeEach
     public void getController() {
-        filmController = new FilmController();
+        filmController = new FilmController(new InMemoryFilmStorage());
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
