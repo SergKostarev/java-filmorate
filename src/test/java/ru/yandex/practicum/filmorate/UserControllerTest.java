@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -34,10 +33,10 @@ public class UserControllerTest {
     }
 
     @Test
-    public void givenIncorrectUser_shouldNotCreateUser() {
+    public void givenIncorrectUserLogin_shouldNotCreateUser() {
         User user = new User(null, "example@example.com", "",
                 "Test name", LocalDate.of(2000, 1, 1));
-        Assertions.assertThrows(ValidationException.class, () -> userController.create(user));
+        assertThat(validator.validate(user).size()).isEqualTo(1);
     }
 
     @Test
@@ -65,8 +64,8 @@ public class UserControllerTest {
         User userReturned = userController.create(new User(null, "example@example.com",
                 "Test_login", "Test name", LocalDate.of(2000, 1, 1)));
         Assertions.assertNotNull(userReturned);
-        Assertions.assertThrows(ValidationException.class, () -> userController.create(new User(null, "example_example.com",
-                "", "Test name", LocalDate.of(2000, 1, 1))));
+        assertThat(validator.validate(new User(null, "example@example.com",
+                "", "Test name 2", LocalDate.of(2000, 1, 1))).size()).isEqualTo(1);
     }
 
     @Test

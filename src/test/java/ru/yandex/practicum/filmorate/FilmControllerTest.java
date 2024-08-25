@@ -1,20 +1,25 @@
 package ru.yandex.practicum.filmorate;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class FilmControllerTest {
     FilmController filmController;
+    Validator validator;
 
     @BeforeEach
     public void getController() {
         filmController = new FilmController();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Test
@@ -30,7 +35,7 @@ public class FilmControllerTest {
     public void givenIncorrectFilm_shouldNotCreateFilm() {
         Film film = new Film(null, "Test name", "Test description",
                 LocalDate.of(2010, 1, 1), -60);
-        Assertions.assertThrows(ValidationException.class, () -> filmController.create(film));
+        assertThat(validator.validate(film).size()).isEqualTo(1);
     }
 
     @Test
@@ -53,9 +58,9 @@ public class FilmControllerTest {
                 "Test name", "Test description",
                 LocalDate.of(2010, 1, 1), 60));
         Assertions.assertNotNull(filmReturned);
-        Assertions.assertThrows(ValidationException.class, () -> filmController.create(new Film(1L,
+        assertThat(validator.validate(new Film(1L,
                 "Test name 2", "Test description 2",
-                LocalDate.of(2010, 1, 1), -60)));
+                LocalDate.of(2010, 1, 1), -60)).size()).isEqualTo(1);
     }
 
     @Test

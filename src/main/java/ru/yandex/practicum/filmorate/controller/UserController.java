@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,6 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        isValid(user);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -38,9 +36,10 @@ public class UserController {
     @PutMapping
     public User update(@Valid @RequestBody User newUser) {
         if (newUser.getId() == null) {
-            processError("Id пользователя должен быть указан", newUser);
+            String message = "Id пользователя должен быть указан";
+            log.error(message, newUser);
+            throw new ValidationException(message);
         }
-        isValid(newUser);
         if (users.containsKey(newUser.getId())) {
             User oldUser = users.get(newUser.getId());
             if (newUser.getName() == null || newUser.getName().isBlank()) {
@@ -59,21 +58,6 @@ public class UserController {
         throw new ValidationException(message);
     }
 
-    private void isValid(User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank()
-                || !user.getEmail().contains("@")) {
-            processError("Некорректный email", user);
-        }
-        if (user.getLogin() == null || user.getLogin().isBlank()
-                || user.getLogin().contains(" ")) {
-            processError("Некорректный логин", user);
-        }
-        if (user.getBirthday() != null
-                && user.getBirthday().isAfter(LocalDate.now())) {
-            processError("Дата рождения не может быть позже " + LocalDate.now(), user);
-        }
-    }
-
     private long getNextId() {
         long currentMaxId = users.keySet()
                 .stream()
@@ -81,10 +65,5 @@ public class UserController {
                 .max()
                 .orElse(0);
         return ++currentMaxId;
-    }
-
-    private void processError(String message, User user) {
-        log.error(message, user);
-        throw new ValidationException(message);
     }
 }

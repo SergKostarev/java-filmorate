@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,13 +18,16 @@ public class User {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Email
-    @NotBlank
+    @Email(message = "Некорректный email")
+    @NotBlank(message = "Пустой email")
     private String email;
 
+    @NotNull(message = "Пустой логин")
+    @NotBlank(message = "Пустой логин")
     private String login;
 
     private String name;
 
+    @PastOrPresent(message = "Дата рождения не может быть текущей")
     private LocalDate birthday;
 }

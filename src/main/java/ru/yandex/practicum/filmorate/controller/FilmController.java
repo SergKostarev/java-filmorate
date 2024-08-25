@@ -52,18 +52,9 @@ public class FilmController {
     }
 
     private void isValid(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
-            processError("Название фильма не может быть пустым", film);
-        }
-        if (film.getDescription() != null && film.getDescription().length() > 200) {
-            processError("Название фильма может содержать не более 200 символов", film);
-        }
         if (film.getReleaseDate() != null
                 && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             processError("Дата выхода фильма должна быть позже 28 декабря 1895", film);
-        }
-        if (film.getDuration() < 0) {
-            processError("Продолжительность фильма должна быть положительным числом", film);
         }
     }
 
