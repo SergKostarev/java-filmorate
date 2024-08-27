@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -18,6 +19,15 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Collection<User> findAll() {
         return users.values();
+    }
+
+    @Override
+    public User findUser(long id) {
+        if (users.get(id) == null) {
+            log.error(String.valueOf(id), "Пользователь не найден");
+            throw new NotFoundException(String.valueOf(id), "Пользователь не найден");
+        }
+        return users.get(id);
     }
 
     @Override
@@ -38,22 +48,17 @@ public class InMemoryUserStorage implements UserStorage {
             log.error(message, newUser);
             throw new ValidationException(message);
         }
-        if (users.containsKey(newUser.getId())) {
-            User oldUser = users.get(newUser.getId());
-            if (newUser.getName() == null || newUser.getName().isBlank()) {
-                oldUser.setName(newUser.getLogin());
-            } else {
-                oldUser.setName(newUser.getName());
-            }
-            oldUser.setEmail(newUser.getEmail());
-            oldUser.setLogin(newUser.getLogin());
-            oldUser.setBirthday(newUser.getBirthday());
-            log.info("Пользователь успешно обновлен", oldUser);
-            return oldUser;
+        User oldUser = findUser(newUser.getId());
+        if (newUser.getName() == null || newUser.getName().isBlank()) {
+            oldUser.setName(newUser.getLogin());
+        } else {
+            oldUser.setName(newUser.getName());
         }
-        String message = "Пользователь с id = " + newUser.getId() + " не найден";
-        log.error(message, newUser);
-        throw new ValidationException(message);
+        oldUser.setEmail(newUser.getEmail());
+        oldUser.setLogin(newUser.getLogin());
+        oldUser.setBirthday(newUser.getBirthday());
+        log.info("Пользователь успешно обновлен", oldUser);
+        return oldUser;
     }
 
     private long getNextId() {

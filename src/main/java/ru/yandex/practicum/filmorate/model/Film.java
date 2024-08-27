@@ -1,15 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@AllArgsConstructor
 public class Film {
 
     @EqualsAndHashCode.Include
@@ -26,4 +26,14 @@ public class Film {
 
     @PositiveOrZero(message = "Продолжительность фильма должна быть положительным числом")
     private int duration;
+
+    private final Set<Long> likes = new HashSet<>();
+
+    public Film(Long id, String name, String description, LocalDate releaseDate, int duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 }

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -22,6 +23,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Film findFilm(long id) {
+        if (films.get(id) == null) {
+            log.error(String.valueOf(id), "Фильм не найден");
+            throw new NotFoundException(String.valueOf(id), "Фильм не найден");
+        }
+        return films.get(id);
+    }
+
+    @Override
     public Film create(Film film) {
         isValid(film);
         film.setId(getNextId());
@@ -36,18 +46,13 @@ public class InMemoryFilmStorage implements FilmStorage {
             processError("Id фильма должен быть указан", newFilm);
         }
         isValid(newFilm);
-        if (films.containsKey(newFilm.getId())) {
-            Film oldFilm = films.get(newFilm.getId());
-            oldFilm.setName(newFilm.getName());
-            oldFilm.setDescription(newFilm.getDescription());
-            oldFilm.setReleaseDate(newFilm.getReleaseDate());
-            oldFilm.setDuration(newFilm.getDuration());
-            log.info("Фильм успешно обновлен", oldFilm);
-            return oldFilm;
-        }
-        String message = "Фильм с id = " + newFilm.getId() + " не найден";
-        log.error(message, newFilm);
-        throw new ValidationException(message);
+        Film oldFilm = findFilm(newFilm.getId());
+        oldFilm.setName(newFilm.getName());
+        oldFilm.setDescription(newFilm.getDescription());
+        oldFilm.setReleaseDate(newFilm.getReleaseDate());
+        oldFilm.setDuration(newFilm.getDuration());
+        log.info("Фильм успешно обновлен", oldFilm);
+        return oldFilm;
     }
 
     private void isValid(Film film) {
