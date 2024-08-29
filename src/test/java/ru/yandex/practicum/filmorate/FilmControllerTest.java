@@ -23,7 +23,7 @@ public class FilmControllerTest {
     public void getController() {
         InMemoryUserStorage userStorage = new InMemoryUserStorage();
         InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
-        filmController = new FilmController(filmStorage, new FilmService(filmStorage, userStorage));
+        filmController = new FilmController(new FilmService(filmStorage, userStorage));
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 

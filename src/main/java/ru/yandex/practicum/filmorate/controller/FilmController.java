@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ParameterNotValidException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,31 +17,30 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
+@Validated
 public class FilmController {
-
-    private final FilmStorage filmStorage;
 
     private final FilmService filmService;
 
     @GetMapping("/{id}")
     public Film findFilm(@PathVariable Long id) {
         idValidityCheck(id, "Некорректное значение параметра id фильма, должно быть больше 0");
-        return filmStorage.findFilm(id);
+        return filmService.findFilm(id);
     }
 
     @GetMapping
     public Collection<Film> findAll() {
-        return filmStorage.findAll();
+        return filmService.findAll();
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        return filmStorage.create(film);
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
-        return filmStorage.update(newFilm);
+        return filmService.update(newFilm);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -60,14 +60,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopular(@RequestParam(defaultValue = "10") Integer count) {
-        if (count < 1) {
-            String message = "Некорректное значение " +
-                    "параметра count, должно быть больше 0";
-            String value = String.valueOf(count);
-            log.error(value, message);
-            throw new ParameterNotValidException(value, message);
-        }
+    public List<Film> getMostPopular(@Positive @RequestParam(defaultValue = "10") Integer count) {
         return filmService.getMostPopular(count);
     }
 

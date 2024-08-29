@@ -22,7 +22,7 @@ public class UserControllerTest {
     @BeforeEach
     public void getController() {
         InMemoryUserStorage storage = new InMemoryUserStorage();
-        userController = new UserController(storage, new UserService(storage));
+        userController = new UserController(new UserService(storage));
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
