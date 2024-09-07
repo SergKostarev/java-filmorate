@@ -7,7 +7,7 @@ Template repository for Filmorate project.
 
 ## Query examples
 
-### Users
+### User
 
 1. Get all users
 
@@ -39,7 +39,7 @@ SET email = 'anotherexample@example.com'
 WHERE user_id = 1
 ```
 
-### Films
+### Film
 
 1. Get all films
 
@@ -120,4 +120,31 @@ UNION
 SELECT user_id_1
 FROM Friendship
 WHERE user_id_2 = 1
+```
+
+### Like
+
+1. Add like (e.g. user with identifier 1 likes film with identifier 1)
+
+```sql
+INSERT INTO Like
+VALUES (1, 1)
+```
+
+2. Dislike (e.g. user with identifier 1 dislikes film with identifier 1)
+
+```sql
+DELETE
+FROM Like
+WHERE user_id = 1 AND film_id = 1
+```
+
+3. Get most popular (e.g. 10) movies
+
+```sql
+SELECT film_id
+FROM Like
+GROUP BY film_id
+ORDER BY COUNT(user_id) DESC
+LIMIT 10
 ```
