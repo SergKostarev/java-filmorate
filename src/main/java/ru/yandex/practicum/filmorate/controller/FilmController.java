@@ -1,75 +1,74 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ParameterNotValidException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
+@Validated
 public class FilmController {
 
-    private final Map<Long, Film> films = new HashMap<>();
+    private final FilmService filmService;
+
+    @GetMapping("/{id}")
+    public Film findFilm(@PathVariable Long id) {
+        idValidityCheck(id, "Некорректное значение параметра id фильма, должно быть больше 0");
+        return filmService.findFilm(id);
+    }
 
     @GetMapping
     public Collection<Film> findAll() {
-        return films.values();
+        return filmService.findAll();
     }
 
     @PostMapping
-    public Film create(@RequestBody Film film) {
-        isValid(film);
-        film.setId(getNextId());
-        films.put(film.getId(), film);
-        log.info("Фильм успешно добавлен", film);
-        return film;
+    public Film create(@Valid @RequestBody Film film) {
+        return filmService.create(film);
     }
 
     @PutMapping
-    public Film update(@RequestBody Film newFilm) {
-        if (newFilm.getId() == null) {
-            processError("Id фильма должен быть указан", newFilm);
+    public Film update(@Valid @RequestBody Film newFilm) {
+        return filmService.update(newFilm);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void like(@PathVariable Long id, @PathVariable Long userId) {
+        idValidityCheck(id, "Некорректное значение параметра id фильма, должно быть больше 0");
+        idValidityCheck(userId,"Некорректное значение параметра id пользователя," +
+                "должно быть больше 0");
+        filmService.like(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void dislike(@PathVariable Long id, @PathVariable Long userId) {
+        idValidityCheck(id, "Некорректное значение параметра id фильма, должно быть больше 0");
+        idValidityCheck(userId,"Некорректное значение параметра id пользователя," +
+                "должно быть больше 0");
+        filmService.dislike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getMostPopular(@Positive @RequestParam(defaultValue = "10") Integer count) {
+        return filmService.getMostPopular(count);
+    }
+
+    private void idValidityCheck(Long id, String message) {
+        if (id == null || id < 1) {
+            String value = String.valueOf(id);
+            log.error(value, message);
+            throw new ParameterNotValidException(String.valueOf(id), message);
         }
-        isValid(newFilm);
-        if (films.containsKey(newFilm.getId())) {
-            Film oldFilm = films.get(newFilm.getId());
-            oldFilm.setName(newFilm.getName());
-            oldFilm.setDescription(newFilm.getDescription());
-            oldFilm.setReleaseDate(newFilm.getReleaseDate());
-            oldFilm.setDuration(newFilm.getDuration());
-            log.info("Фильм успешно обновлен", oldFilm);
-            return oldFilm;
-        }
-        String message = "Фильм с id = " + newFilm.getId() + " не найден";
-        log.error(message, newFilm);
-        throw new ValidationException(message);
     }
-
-    private void isValid(Film film) {
-        if (film.getReleaseDate() != null
-                && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            processError("Дата выхода фильма должна быть позже 28 декабря 1895", film);
-        }
-    }
-
-    private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
-    }
-
-    private void processError(String message, Film film) {
-        log.error(message, film);
-        throw new ValidationException(message);
-    }
-
 }

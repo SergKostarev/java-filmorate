@@ -1,69 +1,91 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ParameterNotValidException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    private final Map<Long, User> users = new HashMap<>();
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> findAll() {
-        return users.values();
+        return userService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public User findUser(@PathVariable Long id) {
+        idValidityCheck(id);
+        return userService.findUser(id);
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        user.setId(getNextId());
-        users.put(user.getId(), user);
-        log.info("Пользователь успешно добавлен", user);
-        return user;
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@Valid @RequestBody User newUser) {
-        if (newUser.getId() == null) {
-            String message = "Id пользователя должен быть указан";
-            log.error(message, newUser);
-            throw new ValidationException(message);
-        }
-        if (users.containsKey(newUser.getId())) {
-            User oldUser = users.get(newUser.getId());
-            if (newUser.getName() == null || newUser.getName().isBlank()) {
-                oldUser.setName(newUser.getLogin());
-            } else {
-                oldUser.setName(newUser.getName());
-            }
-            oldUser.setEmail(newUser.getEmail());
-            oldUser.setLogin(newUser.getLogin());
-            oldUser.setBirthday(newUser.getBirthday());
-            log.info("Пользователь успешно обновлен", oldUser);
-            return oldUser;
-        }
-        String message = "Пользователь с id = " + newUser.getId() + " не найден";
-        log.error(message, newUser);
-        throw new ValidationException(message);
+        return userService.update(newUser);
     }
 
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        idValidityCheck(id);
+        idValidityCheck(friendId);
+        idInequalityCheck(id, friendId);
+        userService.addFriend(id, friendId);
     }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        idValidityCheck(id);
+        idValidityCheck(friendId);
+        userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable Long id) {
+        idValidityCheck(id);
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        idValidityCheck(id);
+        idInequalityCheck(id, otherId);
+        return userService.getCommonFriends(id, otherId);
+    }
+
+    private void idValidityCheck(Long id) {
+        if (id == null || id < 1) {
+            String message = "Некорректное значение параметра id" +
+                    "пользователя, должно быть больше 0";
+            String value = String.valueOf(id);
+            log.error(value, message);
+            throw new ParameterNotValidException(value, message);
+        }
+    }
+
+    private void idInequalityCheck(long id, long friendId) {
+        if (id == friendId) {
+            String message = "Переданы одинаковые параметры id " +
+                    "пользователей";
+            String value = String.valueOf(id);
+            log.error(value, message);
+            throw new ParameterNotValidException(value, message);
+        }
+    }
+
 }
