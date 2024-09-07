@@ -91,35 +91,43 @@ WHERE user_id_1 = 1 AND user_id_2 = 2
 3. Get friends of user by identifier (e.g. 1)
 
 ```sql
-SELECT user_id_2
-FROM Friendship
-WHERE user_id_1 = 1
-UNION
-SELECT user_id_1
-FROM Friendship
-WHERE user_id_2 = 1
+SELECT *
+FROM User
+WHERE user_id IN (
+  SELECT user_id_2
+  FROM Friendship
+  WHERE user_id_1 = 1
+  UNION
+  SELECT user_id_1
+  FROM Friendship
+  WHERE user_id_2 = 1
+)
 ```
 
 4. Get common friends of users by identifiers (e.g. 1 && 2)
 
 ```sql
-SELECT user_id_2
-FROM Friendship
-WHERE user_id_1 = 2
-UNION
-SELECT user_id_1
-FROM Friendship
-WHERE user_id_2 = 2
+SELECT *
+FROM User
+WHERE user_id IN (
+  SELECT user_id_2
+  FROM Friendship
+  WHERE user_id_1 = 2
+  UNION
+  SELECT user_id_1
+  FROM Friendship
+  WHERE user_id_2 = 2
 
-INTERSECT
-
-SELECT user_id_2
-FROM Friendship
-WHERE user_id_1 = 1
-UNION
-SELECT user_id_1
-FROM Friendship
-WHERE user_id_2 = 1
+  INTERSECT
+  
+  SELECT user_id_2
+  FROM Friendship
+  WHERE user_id_1 = 1
+  UNION
+  SELECT user_id_1
+  FROM Friendship
+  WHERE user_id_2 = 1
+)
 ```
 
 5. Delete friend (e.g. user with identifier 1 deletes user with identifier 2)
@@ -150,9 +158,13 @@ WHERE user_id = 1 AND film_id = 1
 3. Get most popular (e.g. 10) movies
 
 ```sql
-SELECT film_id
-FROM Like
-GROUP BY film_id
-ORDER BY COUNT(user_id) DESC
-LIMIT 10
+SELECT *
+FROM Film
+WHERE film_id IN (
+  SELECT film_id
+  FROM Like
+  GROUP BY film_id
+  ORDER BY COUNT(user_id) DESC
+  LIMIT 10
+)
 ```
