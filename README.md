@@ -11,15 +11,31 @@ Template repository for Filmorate project.
 
 ```sql
 SELECT *
-FROM user
+FROM User
 ```
 
-2. Get an user by identifier (for example, 1)
+2. Get user by identifier (e.g. 1)
 
 ```sql
 SELECT *
-FROM user
-WHERE user.id = 1
+FROM User
+WHERE user_id = 1
 ```
+
+3. Create user
+
+```sql
+INSERT INTO User
+VALUES (1, example@example.com, Some_login, Some_name, '1990-01-01');
+```
+
+4. Update user by identifier (e.g. 1)
+
+```sql
+UPDATE User
+SET email = 'example@example.com'
+WHERE user_id = 1
+```
+
 
 
