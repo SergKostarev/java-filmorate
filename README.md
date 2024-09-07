@@ -122,6 +122,14 @@ FROM Friendship
 WHERE user_id_2 = 1
 ```
 
+5. Delete friend (e.g. user with identifier 1 deletes user with identifier 2)
+
+```sql
+DELETE
+FROM Friendship
+WHERE user_id_1 = 1 AND user_id_2 = 2
+```
+
 ### Like
 
 1. Add like (e.g. user with identifier 1 likes film with identifier 1)
