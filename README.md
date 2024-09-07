@@ -14,4 +14,12 @@ SELECT *
 FROM user
 ```
 
+2. Get an user by identifier (for example, 1)
+
+```sql
+SELECT *
+FROM user
+WHERE user.id = 1
+```
+
 
