@@ -7,11 +7,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Slf4j
@@ -48,11 +52,13 @@ public class FilmService {
             processError("Id фильма должен быть указан", newFilm);
         }
         isValid(newFilm);
+        processGenresAndRating(newFilm);
         return filmStorage.update(newFilm);
     }
 
     public Film create(Film film) {
         isValid(film);
+        processGenresAndRating(film);
         return filmStorage.create(film);
     }
 
@@ -74,5 +80,15 @@ public class FilmService {
     private void processError(String message, Film film) {
         log.error(message, film);
         throw new ValidationException(message);
+    }
+
+    private void processGenresAndRating(Film film) {
+        film.setGenres(new ArrayList<>(new LinkedHashSet<>(film.getGenres())));
+        for (Genre genre : film.getGenres()) {
+            genre.setName(filmStorage.getGenre(genre.getId()).getName());
+        }
+        if (film.getMpa() != null) {
+            film.getMpa().setName(filmStorage.getRating(film.getMpa().getId()).getName());
+        }
     }
 }

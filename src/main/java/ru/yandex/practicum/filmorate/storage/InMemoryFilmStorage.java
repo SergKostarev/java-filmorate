@@ -16,7 +16,7 @@ import java.util.*;
 
 @Slf4j
 @Component("inMemoryFilmStorage")
-@Primary
+//@Primary
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
@@ -64,7 +64,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        processGenresAndRating(film);
         film.setId(getNextId());
         films.put(film.getId(), film);
         likes.put(film.getId(), new HashSet<>());
@@ -137,16 +136,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException(String.valueOf(id), "Жанр не найден");
         }
         return genre.get();
-    }
-
-    private void processGenresAndRating(Film film) {
-        film.setGenres(new ArrayList<>(new LinkedHashSet<>(film.getGenres())));
-        for (Genre genre : film.getGenres()) {
-            Genre inMemoryGenre = getGenre(genre.getId());
-            genre.setName(inMemoryGenre.getName());
-        }
-        Rating inMemoryRating = getRating(film.getMpa().getId());
-        film.getMpa().setName(inMemoryRating.getName());
     }
 
     private long getNextId() {

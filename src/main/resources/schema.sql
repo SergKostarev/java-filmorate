@@ -7,17 +7,14 @@ DROP TABLE IF EXISTS users; -- remove!
 DROP TABLE IF EXISTS rating; -- remove!
 
 
-
-
-
 CREATE TABLE IF NOT EXISTS genre (
     id BIGINT PRIMARY KEY,
-    description TEXT NOT NULL CHECK(LENGTH(description) > 0)
+    description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS rating (
     id BIGINT PRIMARY KEY,
-    description TEXT NOT NULL CHECK(LENGTH(description) > 0)
+    description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -31,10 +28,10 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS films (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name TEXT NOT NULL CHECK(LENGTH(name) > 0),
-    description VARCHAR(200) CHECK(LENGTH(description) >= 200),
+    description VARCHAR(200),
     release_date DATE,
     duration INTEGER CHECK(duration >= 0),
-    rating_id BIGINT DEFAULT NULL REFERENCES rating(id)
+    rating_id BIGINT DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS film_genre (
