@@ -6,12 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ParameterNotValidException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
 import java.util.List;
+
+import static ru.yandex.practicum.filmorate.validation.ValidationUtils.idValidityCheck;
 
 @Slf4j
 @RestController
@@ -30,7 +31,10 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        return filmService.findAll();
+        return filmService
+                .findAll()
+                .stream()
+                .toList();
     }
 
     @PostMapping
@@ -61,14 +65,10 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getMostPopular(@Positive @RequestParam(defaultValue = "10") Integer count) {
-        return filmService.getMostPopular(count);
+        return filmService
+                .getMostPopular(count)
+                .stream()
+                .toList();
     }
 
-    private void idValidityCheck(Long id, String message) {
-        if (id == null || id < 1) {
-            String value = String.valueOf(id);
-            log.error(value, message);
-            throw new ParameterNotValidException(String.valueOf(id), message);
-        }
-    }
 }
