@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -31,19 +29,6 @@ public class InMemoryUserStorage implements UserStorage {
     public void addFriend(long id, long friendId) {
         getFriends(id).add(friendId);
     }
-
-    /*
-    @Override
-    public void confirmFriend(long id, long friendId) {
-        if (!getFriends(friendId).contains(id)) {
-            log.error(String.valueOf(id), "Пользователь не найден в списке друзей пользователя," +
-                    "невозможно подтвердить дружбу");
-            throw new NotFoundException(String.valueOf(friendId), "Пользователь не найден в списке друзей пользователя," +
-                    "невозможно подтвердить дружбу");
-        }
-        getFriends(id).add(friendId);
-    }
-    */
 
     @Override
     public void deleteFriend(long id, long friendId) {

@@ -1,13 +1,3 @@
-DROP TABLE IF EXISTS film_genre; -- remove!
-DROP TABLE IF EXISTS film_rating; -- remove!
-DROP TABLE IF EXISTS friendship; -- remove!
-DROP TABLE IF EXISTS likes; -- remove!
-DROP TABLE IF EXISTS genre; -- remove!
-DROP TABLE IF EXISTS films; -- remove!
-DROP TABLE IF EXISTS users; -- remove!
-DROP TABLE IF EXISTS rating; -- remove!
-
-
 CREATE TABLE IF NOT EXISTS genre (
     id BIGINT PRIMARY KEY,
     description TEXT
@@ -32,7 +22,6 @@ CREATE TABLE IF NOT EXISTS films (
     description VARCHAR(200),
     release_date DATE,
     duration INTEGER CHECK(duration >= 0)
-    --rating_id BIGINT DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS film_rating (

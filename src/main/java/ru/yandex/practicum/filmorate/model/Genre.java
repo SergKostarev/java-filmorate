@@ -16,8 +16,6 @@ public class Genre {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @NotNull(message = "Пустое описание")
-    @NotBlank(message = "Пустое описание")
     private String name;
 
 }

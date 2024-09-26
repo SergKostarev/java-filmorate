@@ -33,5 +33,4 @@ public class GenreController {
                 .stream()
                 .toList();
     }
-
 }

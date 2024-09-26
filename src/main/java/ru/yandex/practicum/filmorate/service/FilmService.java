@@ -2,13 +2,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -23,12 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FilmService {
 
-    //@Autowired
-    @Qualifier(value="inMemoryFilmStorage")
     private final FilmStorage filmStorage;
 
-    //@Autowired
-    @Qualifier(value="inMemoryUserStorage")
     private final UserStorage userStorage;
 
     public void like(long filmId, long userId) {
@@ -85,10 +80,18 @@ public class FilmService {
     private void processGenresAndRating(Film film) {
         film.setGenres(new ArrayList<>(new LinkedHashSet<>(film.getGenres())));
         for (Genre genre : film.getGenres()) {
-            genre.setName(filmStorage.getGenre(genre.getId()).getName());
+            try {
+                genre.setName(filmStorage.getGenre(genre.getId()).getName());
+            } catch (NotFoundException e) {
+                throw new ValidationException("Жанр не найден");
+            }
         }
         if (film.getMpa() != null) {
-            film.getMpa().setName(filmStorage.getRating(film.getMpa().getId()).getName());
+            try {
+                film.getMpa().setName(filmStorage.getRating(film.getMpa().getId()).getName());
+            } catch (NotFoundException e) {
+                throw new ValidationException("Рейтинг не найден");
+            }
         }
     }
 }

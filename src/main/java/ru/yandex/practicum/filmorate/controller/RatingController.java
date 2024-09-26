@@ -33,5 +33,4 @@ public class RatingController {
                 .stream()
                 .toList();
     }
-
 }

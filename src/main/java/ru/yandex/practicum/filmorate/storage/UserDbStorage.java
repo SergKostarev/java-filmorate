@@ -1,13 +1,10 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -43,7 +40,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
                 user.getBirthday()
         );
         user.setId(id);
-        return user;
+        return findUser(id);
     }
 
     @Override
@@ -55,7 +52,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
                 user.getName(),
                 user.getBirthday(),
                 user.getId());
-        return user;
+        return findUser(user.getId());
     }
 
     @Override

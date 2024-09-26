@@ -28,7 +28,6 @@ public class UserController {
         return userService
                 .findAll()
                 .stream()
-                //.map(UserMapper::mapToUserDto)
                 .toList();
     }
 

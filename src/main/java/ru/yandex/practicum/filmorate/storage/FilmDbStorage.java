@@ -32,7 +32,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "VALUES (?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, " +
             "duration = ? WHERE id = ?";
-    private static final String GET_LIKES_ID_QUERY = "SELECT * FROM likes WHERE film_id = ?";
+    private static final String GET_LIKES_ID_QUERY = "SELECT user_id FROM likes WHERE film_id = ?";
     private static final String ADD_LIKE_QUERY = "INSERT into likes(user_id, film_id) VALUES (?, ?)";
     private static final String DELETE_LIKE_QUERY = "DELETE from likes WHERE user_id = ? AND film_id = ?";
     private static final String GET_MOST_POPULAR_QUERY = "SELECT id, name, description, release_date, duration " +
