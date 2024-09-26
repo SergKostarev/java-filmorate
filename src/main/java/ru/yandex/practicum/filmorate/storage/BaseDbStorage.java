@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,6 +14,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 public class BaseDbStorage<T> {
 
@@ -24,7 +26,9 @@ public class BaseDbStorage<T> {
         try {
             return jdbc.queryForObject(query, mapper, params);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(Arrays.stream(params).toArray()[0].toString(), e.getMessage());
+            String id = Arrays.stream(params).toArray()[0].toString();
+            log.error(id, "Не удалось сохранить данные");
+            throw new NotFoundException(id, e.getMessage());
         }
     }
 
@@ -55,6 +59,7 @@ public class BaseDbStorage<T> {
         if (id != null) {
             return id;
         } else {
+            log.error(String.valueOf(id), "Не удалось сохранить данные");
             throw new InternalServerException("Не удалось сохранить данные");
         }
     }

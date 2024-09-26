@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS film_genre; -- remove!
+DROP TABLE IF EXISTS film_rating; -- remove!
 DROP TABLE IF EXISTS friendship; -- remove!
 DROP TABLE IF EXISTS likes; -- remove!
 DROP TABLE IF EXISTS genre; -- remove!
@@ -30,8 +31,14 @@ CREATE TABLE IF NOT EXISTS films (
     name TEXT NOT NULL CHECK(LENGTH(name) > 0),
     description VARCHAR(200),
     release_date DATE,
-    duration INTEGER CHECK(duration >= 0),
-    rating_id BIGINT DEFAULT NULL
+    duration INTEGER CHECK(duration >= 0)
+    --rating_id BIGINT DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS film_rating (
+    film_id BIGINT NOT NULL REFERENCES films(id),
+    rating_id BIGINT NOT NULL REFERENCES rating(id),
+    PRIMARY KEY (film_id, rating_id)
 );
 
 CREATE TABLE IF NOT EXISTS film_genre (
