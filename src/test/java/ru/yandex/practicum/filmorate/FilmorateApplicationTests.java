@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ComponentScan("ru/yandex/practicum/filmorate/storage")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Sql(scripts = "classpath:/initialize-data.sql")
-class FilmoRateApplicationTests {
+class FilmorateApplicationTests {
 
 	@Autowired
 	private final FilmStorage filmStorage;
