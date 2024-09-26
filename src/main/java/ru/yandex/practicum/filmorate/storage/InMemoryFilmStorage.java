@@ -17,20 +17,20 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
 
     private final List<Rating> ratings = List.of(
-            new Rating (1L, "G"),
-            new Rating (2L, "PG"),
-            new Rating (3L, "PG-13"),
-            new Rating (4L, "R"),
-            new Rating (5L, "NC-17")
+            new Rating(1L, "G"),
+            new Rating(2L, "PG"),
+            new Rating(3L, "PG-13"),
+            new Rating(4L, "R"),
+            new Rating(5L, "NC-17")
     );
 
     private final List<Genre> genres = List.of(
-            new Genre (1L, "Комедия"),
-            new Genre (2L, "Драма"),
-            new Genre (3L, "Мультфильм"),
-            new Genre (4L, "Триллер"),
-            new Genre (5L, "Документальный"),
-            new Genre (6L, "Боевик")
+            new Genre(1L, "Комедия"),
+            new Genre(2L, "Драма"),
+            new Genre(3L, "Мультфильм"),
+            new Genre(4L, "Триллер"),
+            new Genre(5L, "Документальный"),
+            new Genre(6L, "Боевик")
     );
 
     private final Map<Long, Set<Long>> likes = new HashMap<>();
