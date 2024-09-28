@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -12,10 +13,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
 
 @Slf4j
 @Component("dbFilmStorage")
@@ -62,7 +62,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         List<Film> films = findMany(FIND_ALL_QUERY);
         for (Film film: films) {
             fillGenresAndRating(film);
@@ -77,6 +77,24 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return film;
     }
 
+    private void addFilmGenres(Film film) {
+        List<Genre> genres = film.getGenres();
+        jdbc.batchUpdate(ADD_FILM_GENRE_QUERY, new BatchPreparedStatementSetter() {
+
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Genre genre = genres.get(i);
+                ps.setLong(1, film.getId());
+                ps.setLong(2, genre.getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return genres.size();
+            }
+        });
+    }
+
     @Override
     public Film create(Film film) {
         long id = insert(
@@ -87,9 +105,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 film.getDuration()
         );
         film.setId(id);
-        for (Genre g: film.getGenres()) {
-            jdbc.update(ADD_FILM_GENRE_QUERY, id, g.getId());
-        }
+        addFilmGenres(film);
         if (film.getMpa() != null) {
             jdbc.update(ADD_FILM_RATING_QUERY, id, film.getMpa().getId());
         }
@@ -107,9 +123,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 film.getId());
         jdbc.update(DELETE_FILM_GENRE_QUERY, film.getId());
         jdbc.update(DELETE_FILM_RATING_QUERY, film.getId());
-        for (Genre g: film.getGenres()) {
-            jdbc.update(ADD_FILM_GENRE_QUERY, film.getId(), g.getId());
-        }
+        addFilmGenres(film);
         if (film.getMpa() != null) {
             jdbc.update(ADD_FILM_RATING_QUERY, film.getId(), film.getMpa().getId());
         }
@@ -167,7 +181,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     private Optional<Rating> getFilmRating(long filmId) {
         try {
-            return Optional.of(jdbc.queryForObject(GET_FILM_RATING, ratingMapper, filmId));
+            return Optional.ofNullable(jdbc.queryForObject(GET_FILM_RATING, ratingMapper, filmId));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }

@@ -40,11 +40,11 @@ public class UserService {
     public List<User> getCommonFriends(long id, long otherId) {
         Set<Long> friends = userStorage.getFriends(id);
         Set<Long> otherFriends = userStorage.getFriends(otherId);
+        friends.retainAll(otherFriends);
         return userStorage
                 .findAll()
                 .stream()
                 .filter(u -> friends.contains(u.getId()))
-                .filter(u -> otherFriends.contains(u.getId()))
                 .toList();
     }
 

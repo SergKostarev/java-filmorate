@@ -31,7 +31,7 @@ public class Film {
 
     private List<Genre> genres = new ArrayList<>();
 
-    private Rating mpa = null;
+    private Rating mpa;
 
     public Film(Long id, String name, String description, LocalDate releaseDate, int duration, List<Genre> genres, Rating mpa) {
         this.id = id;

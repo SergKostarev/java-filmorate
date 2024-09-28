@@ -62,7 +62,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public Set<Long> getFriends(long id) {
-        return Set.copyOf((jdbc.query(GET_FRIENDS_ID_QUERY, new SingleColumnRowMapper<>(Long.class), id)));
+        return new HashSet<>(jdbc.query(GET_FRIENDS_ID_QUERY, new SingleColumnRowMapper<>(Long.class), id));
     }
 
     @Override

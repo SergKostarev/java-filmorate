@@ -31,10 +31,7 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        return filmService
-                .findAll()
-                .stream()
-                .toList();
+        return filmService.findAll();
     }
 
     @PostMapping
@@ -66,9 +63,7 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getMostPopular(@Positive @RequestParam(defaultValue = "10") Integer count) {
         return filmService
-                .getMostPopular(count)
-                .stream()
-                .toList();
+                .getMostPopular(count);
     }
 
 }

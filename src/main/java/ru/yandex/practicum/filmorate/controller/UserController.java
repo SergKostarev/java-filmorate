@@ -25,10 +25,7 @@ public class UserController {
 
     @GetMapping
     public Collection<User> findAll() {
-        return userService
-                .findAll()
-                .stream()
-                .toList();
+        return userService.findAll();
     }
 
     @GetMapping("/{id}")

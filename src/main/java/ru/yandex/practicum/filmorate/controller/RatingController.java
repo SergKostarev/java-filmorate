@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.service.RatingService;
@@ -11,11 +9,9 @@ import java.util.Collection;
 
 import static ru.yandex.practicum.filmorate.validation.ValidationUtils.idValidityCheck;
 
-@Slf4j
 @RestController
 @RequestMapping("/mpa")
 @RequiredArgsConstructor
-@Validated
 public class RatingController {
 
     private final RatingService ratingService;
@@ -28,9 +24,6 @@ public class RatingController {
 
     @GetMapping
     public Collection<Rating> findAllRatings() {
-        return ratingService
-                .findAllRatings()
-                .stream()
-                .toList();
+        return ratingService.findAllRatings();
     }
 }

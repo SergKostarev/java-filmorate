@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -45,13 +46,13 @@ public class FilmService {
         if (newFilm.getId() == null) {
             processError("Id фильма должен быть указан", newFilm);
         }
-        isValid(newFilm);
+        isValidReleaseDate(newFilm);
         processGenresAndRating(newFilm);
         return filmStorage.update(newFilm);
     }
 
     public Film create(Film film) {
-        isValid(film);
+        isValidReleaseDate(film);
         processGenresAndRating(film);
         return filmStorage.create(film);
     }
@@ -64,7 +65,7 @@ public class FilmService {
         return filmStorage.findFilm(id);
     }
 
-    private void isValid(Film film) {
+    private void isValidReleaseDate(Film film) {
         if (film.getReleaseDate() != null
                 && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             processError("Дата выхода фильма должна быть позже 28 декабря 1895", film);
@@ -77,8 +78,9 @@ public class FilmService {
     }
 
     private void processGenresAndRating(Film film) {
-        film.setGenres(new ArrayList<>(new LinkedHashSet<>(film.getGenres())));
-        for (Genre genre : film.getGenres()) {
+        List<Genre> genres = film.getGenres();
+        film.setGenres(new ArrayList<>(new LinkedHashSet<>(genres)));
+        for (Genre genre : genres) {
             try {
                 genre.setName(filmStorage.getGenre(genre.getId()).getName());
             } catch (NotFoundException e) {
@@ -87,7 +89,8 @@ public class FilmService {
         }
         if (film.getMpa() != null) {
             try {
-                film.getMpa().setName(filmStorage.getRating(film.getMpa().getId()).getName());
+                Rating mpa = film.getMpa();
+                mpa.setName(filmStorage.getRating(mpa.getId()).getName());
             } catch (NotFoundException e) {
                 throw new ValidationException("Рейтинг не найден");
             }
