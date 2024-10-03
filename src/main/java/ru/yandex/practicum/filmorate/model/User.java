@@ -6,13 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor
 public class User {
 
     @EqualsAndHashCode.Include
@@ -28,10 +28,8 @@ public class User {
 
     private String name;
 
-    @PastOrPresent(message = "Дата рождения не может быть текущей")
+    @PastOrPresent(message = "Дата рождения не может больше текущей")
     private LocalDate birthday;
-
-    private final Set<Long> friends = new HashSet<>();
 
     public User(Long id, String email, String login, String name, LocalDate birthday) {
         this.id = id;

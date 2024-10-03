@@ -3,12 +3,14 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Film {
 
@@ -27,13 +29,19 @@ public class Film {
     @PositiveOrZero(message = "Продолжительность фильма должна быть положительным числом")
     private int duration;
 
-    private final Set<Long> likes = new HashSet<>();
+    private List<Genre> genres = new ArrayList<>();
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, int duration) {
+    private Rating mpa;
+
+    public Film(Long id, String name, String description, LocalDate releaseDate, int duration, List<Genre> genres, Rating mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        if (genres != null) {
+            this.genres = genres;
+        }
+        this.mpa = mpa;
     }
 }
